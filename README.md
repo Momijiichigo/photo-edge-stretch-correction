@@ -1,3 +1,6 @@
+This is an AI generated project. 
+[Hosted to GitHub page (static page)](https://momijiichigo.github.io/photo-edge-stretch-correction/)
+
 # Photo Edge Stretch Correction
 
 A static web application for correcting horizontal stretching artifacts near photo edges, commonly found in smartphone camera photos.

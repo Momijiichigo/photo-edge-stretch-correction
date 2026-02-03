@@ -31,7 +31,7 @@ function setupEventListeners() {
     // File input
     const fileInput = document.getElementById('fileInput');
     fileInput.addEventListener('change', handleFileSelect);
-    
+
     // Parameter sliders
     const sliders = [
         { id: 'strengthX', param: 'strengthX' },
@@ -40,24 +40,24 @@ function setupEventListeners() {
         { id: 'centerX', param: 'centerX' },
         { id: 'centerY', param: 'centerY' }
     ];
-    
+
     sliders.forEach(({ id, param }) => {
         const slider = document.getElementById(id);
         const valueDisplay = document.getElementById(id + 'Value');
-        
+
         slider.addEventListener('input', (e) => {
             const value = parseFloat(e.target.value);
             valueDisplay.textContent = value.toFixed(3);
             renderer.updateParams({ [param]: value });
         });
     });
-    
+
     // Reset button
     document.getElementById('resetBtn').addEventListener('click', resetParameters);
-    
+
     // Download button
     document.getElementById('downloadBtn').addEventListener('click', downloadImage);
-    
+
     // Drag and drop
     setupDragAndDrop();
 }
@@ -65,18 +65,18 @@ function setupEventListeners() {
 function setupDragAndDrop() {
     const canvasContainer = document.getElementById('canvasContainer');
     const dropZone = document.getElementById('dropZone');
-    
+
     // Prevent default drag behaviors
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
         canvasContainer.addEventListener(eventName, preventDefaults, false);
         document.body.addEventListener(eventName, preventDefaults, false);
     });
-    
+
     function preventDefaults(e) {
         e.preventDefault();
         e.stopPropagation();
     }
-    
+
     // Highlight drop zone when dragging over it
     ['dragenter', 'dragover'].forEach(eventName => {
         canvasContainer.addEventListener(eventName, () => {
@@ -86,14 +86,14 @@ function setupDragAndDrop() {
             }
         }, false);
     });
-    
+
     ['dragleave', 'drop'].forEach(eventName => {
         canvasContainer.addEventListener(eventName, () => {
             canvasContainer.classList.remove('drag-over');
             dropZone.classList.remove('visible');
         }, false);
     });
-    
+
     // Handle dropped files
     canvasContainer.addEventListener('drop', handleDrop, false);
 }
@@ -101,7 +101,7 @@ function setupDragAndDrop() {
 function handleDrop(e) {
     const dt = e.dataTransfer;
     const files = dt.files;
-    
+
     if (files.length > 0) {
         handleFile(files[0]);
     }
@@ -112,9 +112,9 @@ function handleFile(file) {
         alert('Please drop an image file.');
         return;
     }
-    
+
     showLoading(true);
-    
+
     const reader = new FileReader();
     reader.onload = (e) => {
         const img = new Image();
@@ -145,7 +145,7 @@ function updateImageInfo(img, file) {
     const sizeKB = (file.size / 1024).toFixed(1);
     const sizeMB = (file.size / 1024 / 1024).toFixed(2);
     const sizeText = file.size > 1024 * 1024 ? `${sizeMB} MB` : `${sizeKB} KB`;
-    
+
     info.innerHTML = `
         <strong>${file.name}</strong><br>
         ${img.width} × ${img.height} px • ${sizeText}
@@ -158,11 +158,11 @@ function resetParameters() {
     Object.entries(DEFAULT_PARAMS).forEach(([param, value]) => {
         const slider = document.getElementById(param);
         const valueDisplay = document.getElementById(param + 'Value');
-        
+
         slider.value = value;
         valueDisplay.textContent = value.toFixed(2);
     });
-    
+
     // Update renderer
     renderer.updateParams(DEFAULT_PARAMS);
 }
@@ -178,27 +178,32 @@ function showLoading(show) {
 
 function downloadImage() {
     if (!currentImage) return;
-    
+
     showLoading(true);
-    
+
     // Small delay to allow loading overlay to show
     setTimeout(() => {
         try {
             // Get canvas data
+            /** @type {HTMLCanvasElement} */
             const canvas = document.getElementById('glCanvas');
-            
+
             // Convert canvas to blob and download
-            canvas.toBlob((blob) => {
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `corrected_${Date.now()}.png`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                showLoading(false);
-            }, 'image/png');
+            canvas.toBlob(
+                (blob) => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `corrected_${Date.now()}.png`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    showLoading(false);
+                },
+                'image/png',
+                1.0
+            );
         } catch (error) {
             console.error('Download failed:', error);
             alert('Failed to download image. Please try again.');
@@ -216,7 +221,7 @@ document.addEventListener('keydown', (e) => {
             downloadImage();
         }
     }
-    
+
     // Ctrl/Cmd + R to reset
     if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
         e.preventDefault();
