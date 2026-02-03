@@ -275,9 +275,9 @@ class WebGPURenderer {
         this.canvas.width = displayWidth * dpr;
         this.canvas.height = displayHeight * dpr;
 
-        // Set canvas CSS size
-        this.canvas.style.width = `${displayWidth}px`;
-        this.canvas.style.height = `${displayHeight}px`;
+        // // Set canvas CSS size
+        // this.canvas.style.width = `${displayWidth}px`;
+        // this.canvas.style.height = `${displayHeight}px`;
 
         // Store original image for download
         this.originalImage = image;
