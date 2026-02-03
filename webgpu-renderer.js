@@ -283,10 +283,10 @@ class WebGPURenderer {
         this.originalImage = image;
         
         // Create texture from image
-        const imageBitmap = await createImageBitmap(image);
+        // const imageBitmap = await createImageBitmap(image);
         
         this.texture = this.device.createTexture({
-            size: [imageBitmap.width, imageBitmap.height, 1],
+            size: [image.width, image.height, 1],
             format: 'rgba8unorm',
             usage: GPUTextureUsage.TEXTURE_BINDING | 
                    GPUTextureUsage.COPY_DST | 
@@ -294,9 +294,9 @@ class WebGPURenderer {
         });
         
         this.device.queue.copyExternalImageToTexture(
-            { source: imageBitmap },
+            { source: image },
             { texture: this.texture },
-            [imageBitmap.width, imageBitmap.height]
+            [image.width, image.height]
         );
         
         // Create bind group
