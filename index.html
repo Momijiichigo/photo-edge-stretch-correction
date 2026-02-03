@@ -16,18 +16,29 @@
         <main>
             <!-- File Upload Section -->
             <section class="upload-section">
-                <label for="fileInput" class="file-input-label">
-                    <span class="upload-icon">📁</span>
-                    <span class="upload-text">Choose Image</span>
-                    <input type="file" id="fileInput" accept="image/*">
-                </label>
+                <div class="upload-controls">
+                    <label for="fileInput" class="file-input-label">
+                        <span class="upload-icon">📁</span>
+                        <span class="upload-text">Choose Image</span>
+                        <input type="file" id="fileInput" accept="image/*">
+                    </label>
+                    <div class="renderer-selector">
+                        <label for="rendererSelect" class="renderer-label">Backend:</label>
+                        <select id="rendererSelect" class="renderer-select">
+                            <option value="webgl">WebGL</option>
+                            <option value="webgpu">WebGPU (HDR)</option>
+                        </select>
+                    </div>
+                </div>
                 <div id="imageInfo" class="image-info"></div>
+                <div id="backendInfo" class="backend-info"></div>
             </section>
 
             <!-- Canvas Display -->
             <section class="canvas-section">
                 <div class="canvas-container" id="canvasContainer">
-                    <canvas id="glCanvas"></canvas>
+                    <canvas id="webglCanvas" class="renderer-canvas"></canvas>
+                    <canvas id="webgpuCanvas" class="renderer-canvas hidden"></canvas>
                     <div id="dropZone" class="drop-zone">
                         <div class="drop-zone-content">
                             <span class="drop-icon">📤</span>
@@ -97,10 +108,11 @@
         </main>
 
         <footer>
-            <p>Built with WebGL • No server processing • Your images stay private</p>
+            <p>Built with WebGPU/WebGL • No server processing • Your images stay private</p>
         </footer>
     </div>
 
+    <script src="webgl-renderer.js"></script>
     <script src="webgpu-renderer.js"></script>
     <script src="app.js"></script>
 </body>

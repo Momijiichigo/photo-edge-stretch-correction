@@ -34,7 +34,7 @@ class WebGPURenderer {
             centerY: 0.5
         };
         
-        this.initWebGPU();
+        // Don't auto-initialize, let the caller do it
     }
     
     async initWebGPU() {
@@ -287,7 +287,7 @@ class WebGPURenderer {
         
         this.texture = this.device.createTexture({
             size: [imageBitmap.width, imageBitmap.height, 1],
-            format: 'rgba16float',
+            format: 'rgba8unorm',
             usage: GPUTextureUsage.TEXTURE_BINDING | 
                    GPUTextureUsage.COPY_DST | 
                    GPUTextureUsage.RENDER_ATTACHMENT

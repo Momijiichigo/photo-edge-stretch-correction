@@ -6,6 +6,9 @@
 // Global state
 let renderer = null;
 let currentImage = null;
+let currentBackend = 'webgl';
+let webglRenderer = null;
+let webgpuRenderer = null;
 
 // Default parameter values
 const DEFAULT_PARAMS = {
@@ -17,20 +20,88 @@ const DEFAULT_PARAMS = {
 };
 
 // Initialize application
-document.addEventListener('DOMContentLoaded', () => {
-    initializeRenderer();
+document.addEventListener('DOMContentLoaded', async () => {
+    await initializeRenderer();
     setupEventListeners();
 });
 
-function initializeRenderer() {
-    const canvas = document.getElementById('glCanvas');
-    renderer = new WebGLRenderer(canvas);
+async function initializeRenderer(backend = currentBackend) {
+    const webglCanvas = document.getElementById('webglCanvas');
+    const webgpuCanvas = document.getElementById('webgpuCanvas');
+    const backendInfo = document.getElementById('backendInfo');
+    
+    showLoading(true);
+    
+    try {
+        if (backend === 'webgpu') {
+            // Initialize WebGPU if not already done
+            if (!webgpuRenderer) {
+                if (!navigator.gpu) {
+                    throw new Error('WebGPU not supported');
+                }
+                webgpuRenderer = new WebGPURenderer(webgpuCanvas);
+                await webgpuRenderer.initWebGPU();
+            }
+            
+            // Switch to WebGPU
+            renderer = webgpuRenderer;
+            currentBackend = 'webgpu';
+            webglCanvas.classList.add('hidden');
+            webgpuCanvas.classList.remove('hidden');
+            backendInfo.innerHTML = '<span class="backend-badge webgpu">🚀 WebGPU (HDR)</span>';
+        } else {
+            // Initialize WebGL if not already done
+            if (!webglRenderer) {
+                webglRenderer = new WebGLRenderer(webglCanvas);
+            }
+            
+            // Switch to WebGL
+            renderer = webglRenderer;
+            currentBackend = 'webgl';
+            webgpuCanvas.classList.add('hidden');
+            webglCanvas.classList.remove('hidden');
+            backendInfo.innerHTML = '<span class="backend-badge webgl">⚡ WebGL</span>';
+        }
+        backendInfo.style.display = 'block';
+        
+        // Update select value
+        document.getElementById('rendererSelect').value = currentBackend;
+        
+        // Reload current image if exists
+        if (currentImage) {
+            await renderer.loadImage(currentImage.img);
+            // Restore current parameters
+            const params = {};
+            ['strengthX', 'strengthY', 'falloffPower', 'centerX', 'centerY'].forEach(param => {
+                params[param] = parseFloat(document.getElementById(param).value);
+            });
+            renderer.updateParams(params);
+        }
+    } catch (error) {
+        console.error('Renderer initialization failed:', error);
+        if (backend === 'webgpu') {
+            // Fall back to WebGL
+            backendInfo.innerHTML = '<span class="backend-badge warning">⚠️ WebGPU unavailable, using WebGL</span>';
+            backendInfo.style.display = 'block';
+            await initializeRenderer('webgl');
+        } else {
+            alert('Failed to initialize graphics renderer. Please use a modern browser.');
+        }
+    } finally {
+        showLoading(false);
+    }
 }
 
 function setupEventListeners() {
     // File input
     const fileInput = document.getElementById('fileInput');
     fileInput.addEventListener('change', handleFileSelect);
+    
+    // Renderer backend selector
+    const rendererSelect = document.getElementById('rendererSelect');
+    rendererSelect.addEventListener('change', async (e) => {
+        await initializeRenderer(e.target.value);
+    });
 
     // Parameter sliders
     const sliders = [
@@ -116,11 +187,11 @@ function handleFile(file) {
     showLoading(true);
 
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
         const img = new Image();
-        img.onload = () => {
-            currentImage = img;
-            renderer.loadImage(img);
+        img.onload = async () => {
+            currentImage = { img, file };
+            await renderer.loadImage(img);
             updateImageInfo(img, file);
             document.getElementById('downloadBtn').disabled = false;
             showLoading(false);
@@ -184,9 +255,10 @@ function downloadImage() {
     // Small delay to allow loading overlay to show
     setTimeout(() => {
         try {
-            // Get canvas data
-            /** @type {HTMLCanvasElement} */
-            const canvas = document.getElementById('glCanvas');
+            // Get the active canvas
+            const canvas = currentBackend === 'webgpu' 
+                ? document.getElementById('webgpuCanvas')
+                : document.getElementById('webglCanvas');
 
             // Convert canvas to blob and download
             canvas.toBlob(
