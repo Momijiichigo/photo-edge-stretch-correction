@@ -4,7 +4,7 @@
  */
 
 class WebGPURenderer {
-    constructor(canvas) {
+    constructor(/** @type {HTMLCanvasElement} */ canvas) {
         /** @type {HTMLCanvasElement} */
         this.canvas = canvas;
         /** @type {GPUDevice} */
@@ -267,13 +267,13 @@ class WebGPURenderer {
         const maxHeight = Math.min(image.height, 1080);
         const scale = Math.min(maxWidth / image.width, maxHeight / image.height, 1);
 
-        const displayWidth = image.width * scale;
-        const displayHeight = image.height * scale;
-        const dpr = window.devicePixelRatio || 1;
+        // const displayWidth = image.width * scale;
+        // const displayHeight = image.height * scale;
+        // const dpr = window.devicePixelRatio || 1;
 
         // Set canvas internal resolution (accounting for device pixel ratio)
-        this.canvas.width = displayWidth * dpr;
-        this.canvas.height = displayHeight * dpr;
+        this.canvas.width = image.width;
+        this.canvas.height = image.height;
 
         // // Set canvas CSS size
         // this.canvas.style.width = `${displayWidth}px`;

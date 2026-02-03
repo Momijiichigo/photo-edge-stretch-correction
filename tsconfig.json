@@ -3,6 +3,7 @@
     // General
     "target": "ESNext",
     "allowJs": true,
+    // "checkJs": true,
 
     // Modules
     "allowSyntheticDefaultImports": true,
