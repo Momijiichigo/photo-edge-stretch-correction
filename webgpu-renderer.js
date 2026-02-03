@@ -7,14 +7,20 @@ class WebGPURenderer {
     constructor(canvas) {
         /** @type {HTMLCanvasElement} */
         this.canvas = canvas;
+        /** @type {GPUDevice} */
         this.device = null;
+        /** @type {GPUCanvasContext} */
         this.context = null;
+        /** @type {GPURenderPipeline} */
         this.pipeline = null;
+        /** @type {GPUTexture} */
         this.texture = null;
+        /** @type {GPUSampler} */
         this.sampler = null;
         this.imageLoaded = false;
         
         // Bind groups and buffers
+        /** @type {GPUBindGroup} */
         this.bindGroup = null;
         this.uniformBuffer = null;
         this.vertexBuffer = null;
@@ -245,7 +251,11 @@ class WebGPURenderer {
         
         this.device.queue.writeBuffer(this.vertexBuffer, 0, vertices);
     }
-    
+    /**
+     * 
+     * @param {HTMLImageElement} image 
+     * @returns {Promise<void>}
+     */
     async loadImage(image) {
         if (!this.device) {
             console.error('WebGPU device not initialized');
@@ -277,7 +287,7 @@ class WebGPURenderer {
         
         this.texture = this.device.createTexture({
             size: [imageBitmap.width, imageBitmap.height, 1],
-            format: 'rgba8unorm',
+            format: 'rgba16float',
             usage: GPUTextureUsage.TEXTURE_BINDING | 
                    GPUTextureUsage.COPY_DST | 
                    GPUTextureUsage.RENDER_ATTACHMENT

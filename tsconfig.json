@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    // General
+    "target": "ESNext",
+    "allowJs": true,
+
+    // Modules
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+
+    // Type Checking & Safety
+    "strict": true,
+    "types": [
+      "@webgpu/types"
+    ]
+  }
+}
