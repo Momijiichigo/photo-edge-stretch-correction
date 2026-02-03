@@ -50,7 +50,7 @@ class WebGPURenderer {
             this.device = await adapter.requestDevice();
             
             // Setup canvas context with HDR support
-            this.context = this.canvas.getContext('webgpu');
+            this.context = this.canvas.getContext('webgpu', { preserveDrawingBuffer: true });
             const format = navigator.gpu.getPreferredCanvasFormat();
             
             // Configure with HDR support
